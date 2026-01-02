@@ -1,0 +1,129 @@
+# Job Scraper & Candidate Matcher
+
+**Branch:** `add-more-than-one-api`
+
+This branch adds support for **multiple job APIs** to the Job Scraper project, while keeping the **candidate matcher** intact.
+
+Currently, the project supports:
+
+1. **Adzuna API** – France jobs
+2. **Remotive API** – Remote jobs
+
+The goal is to fetch job listings from multiple sources, combine them, and rank them according to candidate skills using **sentence embeddings**.
+
+---
+
+## Project Structure
+
+```
+sana-job/
+│
+├── main.py                  # Entry point: fetches jobs, saves JSON, runs matcher
+├── aggregator.py            # Aggregates jobs from all APIs
+│
+├── apis/
+│   ├── __init__.py
+│   ├── adzuna.py            # Adzuna API integration
+│   └── remotive.py          # Remotive API integration
+│
+├── model/
+│   ├── __init__.py
+│   └── matcher.py           # Candidate matching using SentenceTransformer
+│
+└── data/
+    ├── candidate.json       # Candidate profile
+    └── jobs.json            # Fetched job listings
+```
+
+---
+
+## Features in This Branch
+
+* Added **Remotive API** integration
+* Aggregates jobs from **Adzuna + Remotive**
+* Preserves **original candidate matcher**
+* Saves combined jobs to `data/jobs.json`
+* Ensures jobs are **compatible with matcher** (fields: `title`, `description`, `location`, `skills`, `url`)
+
+---
+
+## Requirements
+
+Python 3.9+ recommended
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+**Example `requirements.txt`:**
+
+```
+requests
+sentence-transformers
+scikit-learn
+```
+
+---
+
+## How to Run
+
+1. Make sure you are on this branch:
+
+```bash
+git checkout add-more-than-one-api
+```
+
+2. Run the main script:
+
+```bash
+python main.py
+```
+
+3. Output:
+
+* `data/jobs.json` → combined job listings
+* Console → top 10 ranked jobs for the candidate
+
+---
+
+## Candidate Matcher
+
+The matcher uses **Sentence-BERT embeddings** and **cosine similarity**:
+
+* Candidate profile (`candidate.json`) contains:
+
+  * `job_title`
+  * `skills` (list)
+  * `location`
+* Each job listing is represented as:
+
+  * `title`, `description`, `location`, `skills`, `url`, `source`
+* The matcher calculates **match_score** (0–100%) and ranks jobs
+
+---
+
+## How to Add More APIs
+
+1. Create a new Python file in `apis/` with a `fetch_jobs()` function
+2. Return a list of job dictionaries compatible with matcher
+3. Update `aggregator.py` to include the new API:
+
+```python
+from apis.new_api import fetch_jobs as fetch_new_api
+jobs.extend(fetch_new_api())
+```
+
+---
+
+## Notes
+
+* Branch name: `add-more-than-one-api`
+* Keep `matcher.py` **unchanged**
+* Optional: implement deduplication for jobs with same `title + location`
+
+---
+
+**Author:** Sana Layouni
+**Date:** 2026-01-02
