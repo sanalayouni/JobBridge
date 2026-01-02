@@ -193,7 +193,6 @@ Using official APIs ensures:
 * JSON
 
 ---
-
 ## 🔮 Future Improvements
 
 * Multi-candidate support
